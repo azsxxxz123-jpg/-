@@ -1,31 +1,26 @@
-"""
-تنفيذ خوارزمية RSA بدون استخدام مكتبات خارجية
-"""
+
 import random
 import math
 
 def is_prime(n, k=5):
-    """اختبار بسيط لمعرفة ما إذا كان العدد أولي"""
+    
     if n <= 1 or n == 4:
         return False
     if n <= 3:
         return True
     
-    # تنفيذ اختبار ميلر-رابين
     d = n - 1
     r = 0
     while d % 2 == 0:
         d //= 2
         r += 1
     
-    # تنفيذ الاختبار k مرة
     for _ in range(k):
         if not miller_test(d, n):
             return False
     return True
 
 def miller_test(d, n):
-    """اختبار ميلر-رابين للأعداد الأولية"""
     a = 2 + random.randint(1, n - 4)
     x = pow(a, d, n)
     
@@ -44,23 +39,19 @@ def miller_test(d, n):
     return False
 
 def generate_prime(bits):
-    """توليد عدد أولي بطول محدد من البتات"""
     while True:
         num = random.getrandbits(bits)
-        # التأكد من أن العدد فردي وأكبر من 3
         num |= 1
         num |= (1 << (bits - 1))
         if is_prime(num):
             return num
 
 def gcd(a, b):
-    """حساب القاسم المشترك الأكبر"""
     while b:
         a, b = b, a % b
     return a
 
 def mod_inverse(e, phi):
-    """حساب المعكوس التبادلي في الحساب المعياري"""
     def extended_gcd(a, b):
         if a == 0:
             return b, 0, 1
@@ -76,56 +67,42 @@ def mod_inverse(e, phi):
 
 class RSA:
     def __init__(self, key_size=512):
-        """إنشاء مفاتيح RSA بحجم محدد"""
         self.key_size = key_size
         self.generate_keys()
     
     def generate_keys(self):
-        """توليد مفاتيح RSA العامة والخاصة"""
-        # توليد عددين أوليين كبيرين
         p = generate_prime(self.key_size // 2)
         q = generate_prime(self.key_size // 2)
         
-        # حساب n و phi
         self.n = p * q
         phi = (p - 1) * (q - 1)
         
-        # اختيار e بحيث يكون e و phi متباديلين في القسمة
-        self.e = 65537  # قيمة شائعة لـ e
+        self.e = 65537  
         while gcd(self.e, phi) != 1:
             self.e += 2
         
-        # حساب d (المفتاح الخاص)
         self.d = mod_inverse(self.e, phi)
         
-        # المفتاح العام: (e, n)
         self.public_key = (self.e, self.n)
-        # المفتاح الخاص: (d, n)
         self.private_key = (self.d, self.n)
     
     def encrypt(self, message):
-        """تشفير الرسالة باستخدام المفتاح العام"""
         e, n = self.public_key
         
-        # تحويل الرسالة إلى أرقام
         if isinstance(message, str):
             message = message.encode('utf-8')
         
         if isinstance(message, bytes):
             message = int.from_bytes(message, byteorder='big')
         
-        # التشفير: c = m^e mod n
         ciphertext = pow(message, e, n)
         return ciphertext
     
     def decrypt(self, ciphertext):
-        """فك تشفير الرسالة باستخدام المفتاح الخاص"""
         d, n = self.private_key
         
-        # فك التشفير: m = c^d mod n
         message = pow(ciphertext, d, n)
         
-        # تحويل الرقم إلى نص
         try:
             byte_length = (message.bit_length() + 7) // 8
             decrypted_bytes = message.to_bytes(byte_length, byteorder='big')
@@ -134,16 +111,13 @@ class RSA:
             return str(message)
     
     def get_public_key(self):
-        """الحصول على المفتاح العام"""
         return self.public_key
     
     def get_private_key(self):
-        """الحصول على المفتاح الخاص"""
         return self.private_key
 
-# مثال على الاستخدام
 if __name__ == "__main__":
-    rsa = RSA(key_size=512)  # استخدام مفاتيح أصغر للتجربة
+    rsa = RSA(key_size=512) 
     message = "Hello RSA"
     
     encrypted = rsa.encrypt(message)
