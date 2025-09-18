@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}AES - التشفير المتماثل المتقدم{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>خوارزمية AES</h1>
+        <p class="lead">
+            خوارزمية التشفير المتماثل المتقدمة (Advanced Encryption Standard)
+            هي معيار تشفير متماثل يستخدم نفس المفتاح للتشفير وفك التشفير.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card crypto-card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3>تشفير وفك تشفير AES</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/aes">
+                    <div class="mb-3">
+                        <label for="text" class="form-label">النص:</label>
+                        <textarea class="form-control" id="text" name="text" rows="3" required></textarea>
+                        <small class="form-text text-muted">
+                            للتشفير: أدخل نصاً عادياً. للفك: أدخل نصاً مشفراً (سداسي عشري أو Base64).
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="key" class="form-label">المفتاح (سداسي عشري):</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="key" name="key" value="2b7e151628aed2a6abf7158809cf4f3c" required>
+                            <button type="button" class="btn btn-outline-secondary" id="generateKey">توليد</button>
+                        </div>
+                        <small class="form-text text-muted">
+                            المفتاح يجب أن يكون 128 بت (16 بايت) بصيغة سداسية عشرية.
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">العملية:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="action" id="encrypt" value="encrypt" checked>
+                            <label class="form-check-label" for="encrypt">
+                                تشفير
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="action" id="decrypt" value="decrypt">
+                            <label class="form-check-label" for="decrypt">
+                                فك التشفير
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">تنفيذ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card crypto-card">
+            <div class="card-header bg-info text-white">
+                <h3>كيف تعمل خوارزمية AES؟</h3>
+            </div>
+            <div class="card-body">
+                <p>
+                    تعمل خوارزمية AES على تشفير البيانات في كتل ثابتة الحجم (128 بت) باستخدام مفتاح بطول 128، 192، أو 256 بت.
+                    تتكون الخوارزمية من عدة جولات من العمليات التالية:
+                </p>
+                
+                <ul>
+                    <li><strong>SubBytes:</strong> استبدال كل بايت بقيمة أخرى من جدول S-box.</li>
+                    <li><strong>ShiftRows:</strong> إزاحة الصفوف في مصفوفة الحالة.</li>
+                    <li><strong>MixColumns:</strong> خلط الأعمدة في مصفوفة الحالة.</li>
+                    <li><strong>AddRoundKey:</strong> إضافة مفتاح الجولة إلى مصفوفة الحالة.</li>
+                </ul>
+                
+                <p>
+                    تتميز AES بأنها:
+                </p>
+                
+                <ul>
+                    <li>سريعة في كل من البرمجيات والأجهزة</li>
+                    <li>آمنة ضد جميع الهجمات المعروفة</li>
+                    <li>سهلة التنفيذ</li>
+                    <li>تستخدم على نطاق واسع في التطبيقات الحديثة</li>
+                </ul>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>ملاحظة:</strong> في هذا التطبيق، نستخدم تنفيذاً بسيطاً لـ AES لأغراض تعليمية.
+                    للتطبيقات الحقيقية، يُفضل استخدام مكتبات مختبرة ومعتمدة.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if result %}
+<div class="row mt-4">
+    <div class="col">
+        <div class="card result-box">
+            <div class="card-header bg-success text-white">
+                <h3>النتيجة</h3>
+            </div>
+            <div class="card-body">
+                {% if result.error %}
+                <div class="alert alert-danger">
+                    {{ result.error }}
+                </div>
+                {% else %}
+                    {% if result.encrypted_hex %}
+                    <h4>النص الأصلي:</h4>
+                    <pre>{{ result.original }}</pre>
+                    
+                    <h4>النص المشفر (سداسي عشري):</h4>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ result.encrypted_hex }}" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.encrypted_hex }}">
+                            <i class="bi bi-clipboard"></i> نسخ
+                        </button>
+                    </div>
+                    
+                    <h4>النص المشفر (Base64):</h4>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ result.encrypted_base64 }}" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.encrypted_base64 }}">
+                            <i class="bi bi-clipboard"></i> نسخ
+                        </button>
+                    </div>
+                    {% endif %}
+                    
+                    {% if result.decrypted %}
+                    <h4>النص المشفر:</h4>
+                    <pre>{{ result.original }}</pre>
+                    
+                    <h4>النص بعد فك التشفير:</h4>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ result.decrypted }}" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.decrypted }}">
+                            <i class="bi bi-clipboard"></i> نسخ
+                        </button>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('generateKey').addEventListener('click', function() {
+        fetch('/api/generate_key')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('key').value = data.key_hex;
+            })
+            .catch(error => {
+                console.error('Error generating key:', error);
+                alert('حدث خطأ أثناء توليد المفتاح');
+            });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}الصفحة الرئيسية{% endblock %}
+
+{% block content %}
+<div class="row text-center mb-4">
+    <div class="col">
+        <h1 class="display-4">مرحباً بك في تطبيق التشفير</h1>
+        <p class="lead">استكشف خوارزميات التشفير المختلفة وتعلم كيفية عملها</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card crypto-card h-100">
+            <div class="card-body text-center">
+                <div class="algorithm-icon text-primary">
+                    <i class="bi bi-lock-fill"></i>
+                </div>
+                <h3 class="card-title">AES</h3>
+                <p class="card-text">
+                    خوارزمية التشفير المتماثل المتقدمة (Advanced Encryption Standard)
+                    هي معيار تشفير متماثل يستخدم نفس المفتاح للتشفير وفك التشفير.
+                </p>
+                <a href="/aes" class="btn btn-primary">استخدام AES</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card crypto-card h-100">
+            <div class="card-body text-center">
+                <div class="algorithm-icon text-success">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <h3 class="card-title">RSA</h3>
+                <p class="card-text">
+                    خوارزمية RSA هي نظام تشفير غير متماثل يستخدم زوجاً من المفاتيح:
+                    مفتاح عام للتشفير ومفتاح خاص لفك التشفير.
+                </p>
+                <a href="/rsa" class="btn btn-success">استخدام RSA</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card crypto-card h-100">
+            <div class="card-body text-center">
+                <div class="algorithm-icon text-warning">
+                    <i class="bi bi-hash"></i>
+                </div>
+                <h3 class="card-title">Hash</h3>
+                <p class="card-text">
+                    دوال التجزئة تحول البيانات إلى قيمة ثابتة الطول.
+                    لا يمكن استرجاع البيانات الأصلية من قيمة التجزئة.
+                </p>
+                <a href="/hash" class="btn btn-warning">استخدام Hash</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3>حول التشفير</h3>
+            </div>
+            <div class="card-body">
+                <h4>ما هو التشفير؟</h4>
+                <p>
+                    التشفير هو عملية تحويل المعلومات إلى رموز غير مفهومة لحمايتها من الوصول غير المصرح به.
+                    يستخدم التشفير خوارزميات رياضية لتحويل البيانات الأصلية (النص العادي) إلى نص مشفر.
+                </p>
+                
+                <h4>أنواع التشفير الرئيسية:</h4>
+                <ul>
+                    <li><strong>التشفير المتماثل:</strong> يستخدم نفس المفتاح للتشفير وفك التشفير (مثل AES).</li>
+                    <li><strong>التشفير غير المتماثل:</strong> يستخدم زوجاً من المفاتيح - مفتاح عام للتشفير ومفتاح خاص لفك التشفير (مثل RSA).</li>
+                    <li><strong>دوال التجزئة:</strong> تحول البيانات إلى قيمة ثابتة الطول ولا يمكن عكسها (مثل SHA-1، MD5).</li>
+                </ul>
+                
+                <h4>استخدامات التشفير:</h4>
+                <ul>
+                    <li>حماية البيانات الحساسة</li>
+                    <li>تأمين الاتصالات عبر الإنترنت</li>
+                    <li>التحقق من هوية المستخدمين</li>
+                    <li>التوقيعات الرقمية</li>
+                    <li>تخزين كلمات المرور بشكل آمن</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

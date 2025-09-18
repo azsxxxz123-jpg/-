@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}RSA - التشفير غير المتماثل{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>خوارزمية RSA</h1>
+        <p class="lead">
+            خوارزمية RSA هي نظام تشفير غير متماثل يستخدم زوجاً من المفاتيح:
+            مفتاح عام للتشفير ومفتاح خاص لفك التشفير.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card crypto-card mb-4">
+            <div class="card-header bg-success text-white">
+                <h3>تشفير وفك تشفير RSA</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/rsa">
+                    <div class="mb-3">
+                        <label for="text" class="form-label">النص:</label>
+                        <textarea class="form-control" id="text" name="text" rows="3" required></textarea>
+                        <small class="form-text text-muted">
+                            للتشفير: أدخل نصاً عادياً. للفك: أدخل الرقم المشفر.
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">المفاتيح الحالية:</label>
+                        <div class="alert alert-info">
+                            <p><strong>المفتاح العام:</strong> {{ public_key }}</p>
+                            <p><strong>المفتاح الخاص:</strong> {{ private_key }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">العملية:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="action" id="encrypt" value="encrypt" checked>
+                            <label class="form-check-label" for="encrypt">
+                                تشفير (باستخدام المفتاح العام)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="action" id="decrypt" value="decrypt">
+                            <label class="form-check-label" for="decrypt">
+                                فك التشفير (باستخدام المفتاح الخاص)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="action" id="generate" value="generate">
+                            <label class="form-check-label" for="generate">
+                                توليد زوج مفاتيح جديد
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">تنفيذ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card crypto-card">
+            <div class="card-header bg-info text-white">
+                <h3>كيف تعمل خوارزمية RSA؟</h3>
+            </div>
+            <div class="card-body">
+                <p>
+                    تعتمد خوارزمية RSA على صعوبة تحليل الأعداد الكبيرة إلى عواملها الأولية.
+                    تتكون من الخطوات التالية:
+                </p>
+                
+                <h5>توليد المفاتيح:</h5>
+                <ol>
+                    <li>اختيار عددين أوليين كبيرين p و q</li>
+                    <li>حساب n = p × q</li>
+                    <li>حساب φ(n) = (p-1) × (q-1)</li>
+                    <li>اختيار عدد e بحيث يكون e و φ(n) متباديلين في القسمة</li>
+                    <li>حساب d بحيث يكون (d × e) mod φ(n) = 1</li>
+                    <li>المفتاح العام هو (e, n) والمفتاح الخاص هو (d, n)</li>
+                </ol>
+                
+                <h5>التشفير:</h5>
+                <p>
+                    لتشفير رسالة m، نحسب: c = m<sup>e</sup> mod n
+                </p>
+                
+                <h5>فك التشفير:</h5>
+                <p>
+                    لفك تشفير النص المشفر c، نحسب: m = c<sup>d</sup> mod n
+                </p>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>ملاحظة:</strong> في هذا التطبيق، نستخدم مفاتيح قصيرة (512 بت) لأغراض العرض.
+                    في التطبيقات الحقيقية، يجب استخدام مفاتيح أطول (2048 بت أو أكثر).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if result %}
+<div class="row mt-4">
+    <div class="col">
+        <div class="card result-box">
+            <div class="card-header bg-success text-white">
+                <h3>النتيجة</h3>
+            </div>
+            <div class="card-body">
+                {% if result.error %}
+                <div class="alert alert-danger">
+                    {{ result.error }}
+                </div>
+                {% else %}
+                    {% if result.encrypted %}
+                    <h4>النص الأصلي:</h4>
+                    <pre>{{ result.original }}</pre>
+                    
+                    <h4>النص المشفر:</h4>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ result.encrypted }}" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.encrypted }}">
+                            <i class="bi bi-clipboard"></i> نسخ
+                        </button>
+                    </div>
+                    
+                    <h4>المفتاح العام المستخدم:</h4>
+                    <pre>{{ result.public_key }}</pre>
+                    {% endif %}
+                    
+                    {% if result.decrypted %}
+                    <h4>النص المشفر:</h4>
+                    <pre>{{ result.original }}</pre>
+                    
+                    <h4>النص بعد فك التشفير:</h4>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" value="{{ result.decrypted }}" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.decrypted }}">
+                            <i class="bi bi-clipboard"></i> نسخ
+                        </button>
+                    </div>
+                    
+                    <h4>المفتاح الخاص المستخدم:</h4>
+                    <pre>{{ result.private_key }}</pre>
+                    {% endif %}
+                    
+                    {% if result.message %}
+                    <div class="alert alert-success">
+                        {{ result.message }}
+                    </div>
+                    
+                    <h4>المفتاح العام الجديد:</h4>
+                    <pre>{{ result.public_key }}</pre>
+                    
+                    <h4>المفتاح الخاص الجديد:</h4>
+                    <pre>{{ result.private_key }}</pre>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

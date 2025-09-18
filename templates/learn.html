@@ -1,0 +1,934 @@
+{% extends "base.html" %}
+
+{% block title %}شرح الخوارزميات{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='learn.css') }}">
+
+<body class="learn-page">
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">
+                <i class="bi bi-book-fill text-primary"></i>
+                الدليل الشامل لخوارزميات التشفير
+            </h1>
+            <p class="lead text-center">فهم عميق لكيفية عمل خوارزميات التشفير في التطبيق</p>
+        </div>
+    </div>
+
+    <!-- جدول المحتويات -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="bi bi-list-check"></i> جدول المحتويات</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>خوارزميات التشفير المتماثل</h5>
+                            <ul>
+                                <li><a href="#aes-overview">خوارزمية AES - نظرة عامة</a></li>
+                                <li><a href="#aes-structure">هيكل AES</a></li>
+                                <li><a href="#aes-subbytes">عملية SubBytes</a></li>
+                                <li><a href="#aes-shiftrows">عملية ShiftRows</a></li>
+                                <li><a href="#aes-mixcolumns">عملية MixColumns</a></li>
+                                <li><a href="#aes-addroundkey">عملية AddRoundKey</a></li>
+                                <li><a href="#aes-keyschedule">جدولة المفاتيح</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>خوارزميات التشفير غير المتماثل</h5>
+                            <ul>
+                                <li><a href="#rsa-overview">خوارزمية RSA - نظرة عامة</a></li>
+                                <li><a href="#rsa-keygen">توليد المفاتيح</a></li>
+                                <li><a href="#rsa-encryption">التشفير والفك</a></li>
+                                <li><a href="#rsa-primes">الأعداد الأولية</a></li>
+                            </ul>
+                            <h5>دوال التجزئة</h5>
+                            <ul>
+                                <li><a href="#hash-overview">دوال التجزئة - مقدمة</a></li>
+                                <li><a href="#sha1-details">خوارزمية SHA-1</a></li>
+                                <li><a href="#md5-details">خوارزمية MD5</a></li>
+                                <li><a href="#simple-hash">التجزئة البسيطة</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- خوارزمية AES -->
+    <div class="row mb-5" id="aes-overview">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-success text-white">
+                    <h2><i class="bi bi-shield-fill-check"></i> خوارزمية AES (Advanced Encryption Standard)</h2>
+                </div>
+                <div class="card-body">
+                    <h3>نظرة عامة</h3>
+                    <p>AES هي خوارزمية تشفير متماثل تستخدم نفس المفتاح للتشفير وفك التشفير. تعمل على كتل بحجم 128 بت مع مفاتيح بأحجام 128، 192، أو 256 بت.</p>
+                    
+                    <h4>المكونات الأساسية:</h4>
+                    <ul>
+                        <li><strong>الحالة (State):</strong> مصفوفة 4×4 بايت تمثل البيانات المدخلة</li>
+                        <li><strong>المفتاح الرئيسي:</strong> مفتاح التشفير الأصلي</li>
+                        <li><strong>مفاتيح الجولات:</strong> مفاتيح فرعية مشتقة من المفتاح الرئيسي</li>
+                        <li><strong>الجولات:</strong> عدد من التحويلات المطبقة على البيانات</li>
+                    </ul>
+
+                    <div class="alert alert-info">
+                        <strong>ملاحظة:</strong> في تطبيقنا، نستخدم AES-128 مع 10 جولات للتشفير.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- هيكل AES -->
+    <div class="row mb-5" id="aes-structure">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-info text-white">
+                    <h3><i class="bi bi-diagram-3"></i> هيكل خوارزمية AES</h3>
+                </div>
+                <div class="card-body">
+                    <h4>خطوات التشفير:</h4>
+                    <ol>
+                        <li><strong>التحضير الأولي:</strong> تحويل البيانات إلى مصفوفة 4×4</li>
+                        <li><strong>AddRoundKey الأولي:</strong> إضافة المفتاح الأولي</li>
+                        <li><strong>الجولات الرئيسية (9 جولات):</strong>
+                            <ul>
+                                <li>SubBytes</li>
+                                <li>ShiftRows</li>
+                                <li>MixColumns</li>
+                                <li>AddRoundKey</li>
+                            </ul>
+                        </li>
+                        <li><strong>الجولة الأخيرة:</strong>
+                            <ul>
+                                <li>SubBytes</li>
+                                <li>ShiftRows</li>
+                                <li>AddRoundKey</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>التشفير (Encryption):</h5>
+                            <pre><code>def encrypt(self, plaintext):
+    state = text2matrix(plaintext)
+    self.__add_round_key(state, round_keys[:4])
+    
+    for i in range(1, 10):
+        self.__round_encrypt(state, round_keys[4*i:4*(i+1)])
+    
+    self.__sub_bytes(state)
+    self.__shift_rows(state)
+    self.__add_round_key(state, round_keys[40:])
+    
+    return matrix2text(state)</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>فك التشفير (Decryption):</h5>
+                            <pre><code>def decrypt(self, ciphertext):
+    state = text2matrix(ciphertext)
+    self.__add_round_key(state, round_keys[40:])
+    self.__inv_shift_rows(state)
+    self.__inv_sub_bytes(state)
+    
+    for i in range(9, 0, -1):
+        self.__round_decrypt(state, round_keys[4*i:4*(i+1)])
+    
+    self.__add_round_key(state, round_keys[:4])
+    
+    return matrix2text(state)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- عملية SubBytes -->
+    <div class="row mb-5" id="aes-subbytes">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-warning text-dark">
+                    <h3><i class="bi bi-grid-3x3-gap"></i> عملية SubBytes</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>عملية استبدال غير خطية تطبق على كل بايت في مصفوفة الحالة باستخدام S-Box (صندوق الاستبدال).</p>
+                    
+                    <h4>كيفية العمل:</h4>
+                    <ol>
+                        <li>لكل بايت في مصفوفة الحالة</li>
+                        <li>استخدم القيمة كفهرس في جدول S-Box</li>
+                        <li>استبدل البايت بالقيمة المقابلة من الجدول</li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>التنفيذ في الكود:</h5>
+                            <pre><code>def __sub_bytes(self, s):
+    for i in range(4):
+        for j in range(4):
+            s[i][j] = Sbox[s[i][j]]</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>العكس (InvSubBytes):</h5>
+                            <pre><code>def __inv_sub_bytes(self, s):
+    for i in range(4):
+        for j in range(4):
+            s[i][j] = InvSbox[s[i][j]]</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-primary">
+                        <strong>S-Box:</strong> جدول ثابت من 256 قيمة يوفر تشفير غير خطي قوي. يعتمد على الرياضيات في المجال المحدود GF(2^8).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- عملية ShiftRows -->
+    <div class="row mb-5" id="aes-shiftrows">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-secondary text-white">
+                    <h3><i class="bi bi-arrow-right-circle"></i> عملية ShiftRows</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>عملية تبديل دوري للصفوف في مصفوفة الحالة، حيث يتم إزاحة كل صف عدد مختلف من المواضع إلى اليسار.</p>
+                    
+                    <h4>قواعد الإزاحة:</h4>
+                    <ul>
+                        <li><strong>الصف 0:</strong> لا يتم إزاحته</li>
+                        <li><strong>الصف 1:</strong> إزاحة موضع واحد إلى اليسار</li>
+                        <li><strong>الصف 2:</strong> إزاحة موضعين إلى اليسار</li>
+                        <li><strong>الصف 3:</strong> إزاحة ثلاثة مواضع إلى اليسار</li>
+                    </ul>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>التنفيذ في الكود:</h5>
+                            <pre><code>def __shift_rows(self, s):
+    # الصف 1: إزاحة موضع واحد
+    s[0][1], s[1][1], s[2][1], s[3][1] = s[1][1], s[2][1], s[3][1], s[0][1]
+    # الصف 2: إزاحة موضعين
+    s[0][2], s[1][2], s[2][2], s[3][2] = s[2][2], s[3][2], s[0][2], s[1][2]
+    # الصف 3: إزاحة ثلاثة مواضع
+    s[0][3], s[1][3], s[2][3], s[3][3] = s[3][3], s[0][3], s[1][3], s[2][3]</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>مثال على التحويل:</h5>
+                            <pre>قبل ShiftRows:        بعد ShiftRows:
+[A0 A1 A2 A3]         [A0 A1 A2 A3]
+[B0 B1 B2 B3]   →     [B1 B2 B3 B0]
+[C0 C1 C2 C3]         [C2 C3 C0 C1]
+[D0 D1 D2 D3]         [D3 D0 D1 D2]</pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>الهدف:</strong> توفير انتشار عبر الأعمدة، بحيث تؤثر التغييرات في عمود واحد على أعمدة متعددة.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- عملية MixColumns -->
+    <div class="row mb-5" id="aes-mixcolumns">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-dark text-white">
+                    <h3><i class="bi bi-grid"></i> عملية MixColumns</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>عملية خلط خطي تطبق على كل عمود في مصفوفة الحالة، تعتمد على ضرب المصفوفات في المجال المحدود GF(2^8).</p>
+                    
+                    <h4>المصفوفة المستخدمة:</h4>
+                    <pre>[02 03 01 01]
+[01 02 03 01]
+[01 01 02 03]
+[03 01 01 02]</pre>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>التنفيذ المبسط:</h5>
+                            <pre><code>def __mix_single_column(self, a):
+    t = a[0] ^ a[1] ^ a[2] ^ a[3]
+    u = a[0]
+    a[0] ^= t ^ xtime(a[0] ^ a[1])
+    a[1] ^= t ^ xtime(a[1] ^ a[2])
+    a[2] ^= t ^ xtime(a[2] ^ a[3])
+    a[3] ^= t ^ xtime(a[3] ^ u)
+
+def __mix_columns(self, s):
+    for i in range(4):
+        self.__mix_single_column(s[i])</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>دالة xtime:</h5>
+                            <pre><code># دالة لضرب عنصر في 02 في GF(2^8)
+xtime = lambda a: (((a << 1) ^ 0x1B) & 0xFF) 
+                   if (a & 0x80) 
+                   else (a << 1)</code></pre>
+                            <div class="alert alert-warning">
+                                <strong>تحذير:</strong> هذه العملية لا تطبق في الجولة الأخيرة من التشفير.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4>العكس (InvMixColumns):</h4>
+                    <pre><code>def __inv_mix_columns(self, s):
+    for i in range(4):
+        u = xtime(xtime(s[i][0] ^ s[i][2]))
+        v = xtime(xtime(s[i][1] ^ s[i][3]))
+        s[i][0] ^= u
+        s[i][1] ^= v
+        s[i][2] ^= u
+        s[i][3] ^= v
+    self.__mix_columns(s)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- عملية AddRoundKey -->
+    <div class="row mb-5" id="aes-addroundkey">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="bi bi-key"></i> عملية AddRoundKey</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>عملية بسيطة تجمع مصفوفة الحالة مع مفتاح الجولة الحالي باستخدام عملية XOR.</p>
+                    
+                    <h4>كيفية العمل:</h4>
+                    <ol>
+                        <li>لكل بايت في مصفوفة الحالة</li>
+                        <li>قم بعملية XOR مع البايت المقابل في مفتاح الجولة</li>
+                        <li>النتيجة تحل محل البايت الأصلي</li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>التنفيذ في الكود:</h5>
+                            <pre><code>def __add_round_key(self, s, k):
+    for i in range(4):
+        for j in range(4):
+            s[i][j] ^= k[i][j]</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>مثال:</h5>
+                            <pre>State:     [A0 A1 A2 A3]
+           [B0 B1 B2 B3]
+           [C0 C1 C2 C3]
+           [D0 D1 D2 D3]
+
+Key:       [K0 K1 K2 K3]
+           [K4 K5 K6 K7]
+           [K8 K9 KA KB]
+           [KC KD KE KF]
+
+Result:    [A0⊕K0 A1⊕K1 A2⊕K2 A3⊕K3]
+           [B0⊕K4 B1⊕K5 B2⊕K6 B3⊕K7]
+           [C0⊕K8 C1⊕K9 C2⊕KA C3⊕KB]
+           [D0⊕KC D1⊕KD D2⊕KE D3⊕KF]</pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>ميزة مهمة:</strong> عملية XOR قابلة للعكس، لذا نفس العملية تستخدم للتشفير وفك التشفير.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدولة المفاتيح -->
+    <div class="row mb-5" id="aes-keyschedule">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-danger text-white">
+                    <h3><i class="bi bi-diagram-2"></i> جدولة المفاتيح (Key Schedule)</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>عملية توليد مفاتيح الجولات من المفتاح الرئيسي. لـ AES-128، نحتاج 11 مفتاح جولة (44 كلمة).</p>
+                    
+                    <h4>خطوات التوليد:</h4>
+                    <ol>
+                        <li>المفتاح الرئيسي يشكل أول 4 كلمات</li>
+                        <li>لكل كلمة جديدة (من 4 إلى 43):
+                            <ul>
+                                <li>إذا كان فهرس الكلمة مضاعف لـ 4: تطبيق تحويلات خاصة</li>
+                                <li>وإلا: XOR مع الكلمتين السابقتين</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>التنفيذ الكامل:</h5>
+                            <pre><code>def change_key(self, master_key):
+    self.round_keys = text2matrix(master_key)
+    
+    for i in range(4, 4 * 11):  # 44 كلمة إجمالاً
+        self.round_keys.append([])
+        if i % 4 == 0:  # كلمة في بداية مفتاح جولة جديد
+            # تطبيق RotWord و SubWord و Rcon
+            byte = self.round_keys[i - 4][0] \
+                 ^ Sbox[self.round_keys[i - 1][1]] \
+                 ^ Rcon[i // 4]
+            self.round_keys[i].append(byte)
+            
+            for j in range(1, 4):
+                byte = self.round_keys[i - 4][j] \
+                     ^ Sbox[self.round_keys[i - 1][(j + 1) % 4]]
+                self.round_keys[i].append(byte)
+        else:
+            # XOR بسيط مع الكلمتين السابقتين
+            for j in range(4):
+                byte = self.round_keys[i - 4][j] \
+                     ^ self.round_keys[i - 1][j]
+                self.round_keys[i].append(byte)</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Rcon:</strong> جدول ثوابت الجولة المستخدم في توليد مفاتيح الجولات، يضمن أن كل مفتاح جولة فريد.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- خوارزمية RSA -->
+    <div class="row mb-5" id="rsa-overview">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-success text-white">
+                    <h2><i class="bi bi-key-fill"></i> خوارزمية RSA</h2>
+                </div>
+                <div class="card-body">
+                    <h3>نظرة عامة</h3>
+                    <p>RSA هي خوارزمية تشفير غير متماثل (مفتاح عام) تعتمد على صعوبة تحليل الأعداد الكبيرة إلى عواملها الأولية.</p>
+                    
+                    <h4>المكونات الأساسية:</h4>
+                    <ul>
+                        <li><strong>المفتاح العام (e, n):</strong> يستخدم للتشفير ويمكن نشره</li>
+                        <li><strong>المفتاح الخاص (d, n):</strong> يستخدم لفك التشفير ويجب الاحتفاظ به سرياً</li>
+                        <li><strong>الأعداد الأولية p و q:</strong> تستخدم لتوليد n</li>
+                    </ul>
+
+                    <h4>أمان RSA:</h4>
+                    <div class="alert alert-danger">
+                        <strong>يعتمد أمان RSA على:</strong>
+                        <ul>
+                            <li>صعوبة تحليل n = p × q إلى عوامله الأولية</li>
+                            <li>حجم المفاتيح (2048 بت أو أكثر في التطبيقات الحقيقية)</li>
+                            <li>جودة توليد الأعداد الأولية</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- توليد مفاتيح RSA -->
+    <div class="row mb-5" id="rsa-keygen">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-info text-white">
+                    <h3><i class="bi bi-gear-fill"></i> توليد مفاتيح RSA</h3>
+                </div>
+                <div class="card-body">
+                    <h4>خطوات التوليد:</h4>
+                    <ol>
+                        <li><strong>توليد أعداد أولية:</strong> اختيار عددين أوليين كبيرين p و q</li>
+                        <li><strong>حساب n:</strong> n = p × q</li>
+                        <li><strong>حساب φ(n):</strong> φ(n) = (p-1) × (q-1)</li>
+                        <li><strong>اختيار e:</strong> عدد صحيح حيث 1 < e < φ(n) و gcd(e, φ(n)) = 1</li>
+                        <li><strong>حساب d:</strong> d ≡ e⁻¹ (mod φ(n))</li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>توليد الأعداد الأولية:</h5>
+                            <pre><code>def generate_prime(bits):
+    while True:
+        num = random.getrandbits(bits)
+        num |= 1  # تأكد أن العدد فردي
+        num |= (1 << (bits - 1))  # تأكد من حجم البتات
+        if is_prime(num):
+            return num</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>اختبار الأولية (Miller-Rabin):</h5>
+                            <pre><code>def is_prime(n, k=5):
+    if n <= 1 or n == 4:
+        return False
+    if n <= 3:
+        return True
+    
+    d = n - 1
+    r = 0
+    while d % 2 == 0:
+        d //= 2
+        r += 1
+    
+    for _ in range(k):
+        if not miller_test(d, n):
+            return False
+    return True</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>توليد المفاتيح الكامل:</h5>
+                            <pre><code>def generate_keys(self):
+    # توليد عددين أوليين
+    p = generate_prime(self.key_size // 2)
+    q = generate_prime(self.key_size // 2)
+    
+    # حساب n و phi
+    self.n = p * q
+    phi = (p - 1) * (q - 1)
+    
+    # اختيار e (عادة 65537)
+    self.e = 65537
+    while gcd(self.e, phi) != 1:
+        self.e += 2
+    
+    # حساب d باستخدام Extended Euclidean Algorithm
+    self.d = mod_inverse(self.e, phi)
+    
+    self.public_key = (self.e, self.n)
+    self.private_key = (self.d, self.n)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تشفير وفك تشفير RSA -->
+    <div class="row mb-5" id="rsa-encryption">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-warning text-dark">
+                    <h3><i class="bi bi-lock-fill"></i> التشفير وفك التشفير في RSA</h3>
+                </div>
+                <div class="card-body">
+                    <h4>معادلات RSA:</h4>
+                    <ul>
+                        <li><strong>التشفير:</strong> C = M^e mod n</li>
+                        <li><strong>فك التشفير:</strong> M = C^d mod n</li>
+                    </ul>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>دالة التشفير:</h5>
+                            <pre><code>def encrypt(self, message):
+    e, n = self.public_key
+    
+    # تحويل الرسالة إلى أرقام
+    if isinstance(message, str):
+        message = message.encode('utf-8')
+    
+    if isinstance(message, bytes):
+        message = int.from_bytes(message, byteorder='big')
+    
+    # التشفير: c = m^e mod n
+    ciphertext = pow(message, e, n)
+    return ciphertext</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>دالة فك التشفير:</h5>
+                            <pre><code>def decrypt(self, ciphertext):
+    d, n = self.private_key
+    
+    # فك التشفير: m = c^d mod n
+    message = pow(ciphertext, d, n)
+    
+    # تحويل الرقم إلى نص
+    try:
+        byte_length = (message.bit_length() + 7) // 8
+        decrypted_bytes = message.to_bytes(byte_length, 
+                                           byteorder='big')
+        return decrypted_bytes.decode('utf-8', errors='ignore')
+    except:
+        return str(message)</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-primary">
+                        <strong>أهمية pow(a, b, n):</strong> تستخدم Python دالة محسنة للأس السريع modular exponentiation لحساب a^b mod n بكفاءة عالية.
+                    </div>
+
+                    <h4>مثال على العمل:</h4>
+                    <pre>لنفترض:
+p = 61, q = 53
+n = p × q = 3233
+φ(n) = (61-1) × (53-1) = 3120
+e = 17 (مختار بحيث gcd(17, 3120) = 1)
+d = 2753 (المعكوس التبادلي لـ 17 mod 3120)
+
+لتشفير الرسالة M = 123:
+C = 123^17 mod 3233 = 855
+
+لفك التشفير:
+M = 855^2753 mod 3233 = 123</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- دوال التجزئة -->
+    <div class="row mb-5" id="hash-overview">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-dark text-white">
+                    <h2><i class="bi bi-hash"></i> دوال التجزئة (Hash Functions)</h2>
+                </div>
+                <div class="card-body">
+                    <h3>نظرة عامة</h3>
+                    <p>دوال التجزئة هي دوال رياضية تحول البيانات من أي حجم إلى قيمة ثابتة الحجم تسمى "hash" أو "digest".</p>
+                    
+                    <h4>الخصائص المطلوبة:</h4>
+                    <ul>
+                        <li><strong>حتمية:</strong> نفس المدخل ينتج دائماً نفس المخرج</li>
+                        <li><strong>كفاءة:</strong> سرعة في الحساب</li>
+                        <li><strong>مقاومة الهجمات:</strong> صعوبة إيجاد مدخلين ينتجان نفس المخرج</li>
+                        <li><strong>تأثير الانهيار:</strong> تغيير صغير في المدخل يؤدي لتغيير كبير في المخرج</li>
+                        <li><strong>ا لاتجاهية:</strong> صعوبة استنتاج المدخل من المخرج</li>
+                    </ul>
+
+                    <h4>الاستخدامات:</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li>التحقق من سلامة البيانات</li>
+                                <li>تخزين كلمات المرور</li>
+                                <li>التوقيع الرقمي</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Blockchain والعملات المشفرة</li>
+                                <li>جداول التجزئة في البرمجة</li>
+                                <li>تحديد هوية الملفات</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHA-1 -->
+    <div class="row mb-5" id="sha1-details">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-info text-white">
+                    <h3><i class="bi bi-shield-check"></i> خوارزمية SHA-1</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>SHA-1 (Secure Hash Algorithm 1) تنتج hash بطول 160 بت (40 حرف سداسي عشري). <strong>ملاحظة:</strong> SHA-1 لم تعد آمنة للاستخدامات الحساسة.</p>
+                    
+                    <h4>خطوات الخوارزمية:</h4>
+                    <ol>
+                        <li><strong>التحضير:</strong> إضافة padding للرسالة</li>
+                        <li><strong>التهيئة:</strong> خمس قيم أولية (h0-h4)</li>
+                        <li><strong>المعالجة:</strong> تقسيم الرسالة إلى كتل 512 بت</li>
+                        <li><strong>التحويل:</strong> 80 جولة من العمليات لكل كتلة</li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>القيم الأولية:</h5>
+                            <pre><code>h0 = 0x67452301
+h1 = 0xEFCDAB89
+h2 = 0x98BADCFE
+h3 = 0x10325476
+h4 = 0xC3D2E1F0</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>الثوابت لكل جولة:</h5>
+                            <pre><code>الجولات 0-19:  K = 0x5A827999
+الجولات 20-39: K = 0x6ED9EBA1
+الجولات 40-59: K = 0x8F1BBCDC
+الجولات 60-79: K = 0xCA62C1D6</code></pre>
+                        </div>
+                    </div>
+
+                    <h5>الجولة الرئيسية:</h5>
+                    <pre><code>for j in range(80):
+    if j < 20:
+        f = (b & c) | ((~b) & d)
+    elif j < 40:
+        f = b ^ c ^ d
+    elif j < 60:
+        f = (b & c) | (b & d) | (c & d)
+    else:
+        f = b ^ c ^ d
+    
+    temp = (left_rotate(a, 5) + f + e + k + w[j]) & 0xffffffff
+    e, d, c, b, a = d, c, left_rotate(b, 30), a, temp</code></pre>
+
+                    <div class="alert alert-warning">
+                        <strong>تحذير أمني:</strong> SHA-1 لديها نقاط ضعف معروفة ولا يُنصح باستخدامها في التطبيقات الحساسة. استخدم SHA-256 أو أحدث.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MD5 -->
+    <div class="row mb-5" id="md5-details">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-secondary text-white">
+                    <h3><i class="bi bi-fingerprint"></i> خوارزمية MD5</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>MD5 (Message Digest 5) تنتج hash بطول 128 بت (32 حرف سداسي عشري). <strong>ملاحظة:</strong> MD5 غير آمنة ولا تستخدم إلا للأغراض التعليمية.</p>
+                    
+                    <h4>هيكل الخوارزمية:</h4>
+                    <ul>
+                        <li><strong>كتل:</strong> 512 بت لكل كتلة</li>
+                        <li><strong>جولات:</strong> 64 جولة لكل كتلة (4 مراحل × 16 جولة)</li>
+                        <li><strong>الحالة:</strong> 4 متغيرات 32 بت (a, b, c, d)</li>
+                    </ul>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>القيم الأولية:</h5>
+                            <pre><code>a0 = 0x67452301
+b0 = 0xefcdab89
+c0 = 0x98badcfe
+d0 = 0x10325476</code></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>الدوال المساعدة:</h5>
+                            <pre><code>F(x,y,z) = (x & y) | ((~x) & z)
+G(x,y,z) = (z & x) | ((~z) & y)  
+H(x,y,z) = x ^ y ^ z
+I(x,y,z) = y ^ (x | (~z))</code></pre>
+                        </div>
+                    </div>
+
+                    <h5>الجولة الرئيسية:</h5>
+                    <pre><code>for j in range(64):
+    if j < 16:
+        f = (b & c) | ((~b) & d)
+        g = j
+    elif j < 32:
+        f = (d & b) | ((~d) & c)
+        g = (5 * j + 1) % 16
+    elif j < 48:
+        f = b ^ c ^ d
+        g = (3 * j + 5) % 16
+    else:
+        f = c ^ (b | (~d))
+        g = (7 * j) % 16
+    
+    temp = d
+    d = c
+    c = b
+    b = (b + left_rotate((a + f + k[j] + m[g]) & 0xffffffff, r[j])) & 0xffffffff
+    a = temp</code></pre>
+
+                    <div class="alert alert-danger">
+                        <strong>خطر أمني:</strong> MD5 مكسورة أمنياً ويمكن إنتاج تصادمات بسهولة. لا تستخدمها إلا للأغراض التعليمية أو التحقق من سلامة البيانات غير الحساسة.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- التجزئة البسيطة -->
+    <div class="row mb-5" id="simple-hash">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-light text-dark">
+                    <h3><i class="bi bi-calculator"></i> دالة التجزئة البسيطة</h3>
+                </div>
+                <div class="card-body">
+                    <h4>الوصف:</h4>
+                    <p>دالة تجزئة بسيطة للأغراض التعليمية فقط. تستخدم عمليات بسيطة مثل الإزاحة و XOR.</p>
+                    
+                    <h4>الخوارزمية:</h4>
+                    <ol>
+                        <li>ابدأ بقيمة أولية (0x5A3C)</li>
+                        <li>لكل بايت في الرسالة:
+                            <ul>
+                                <li>h = ((h << 5) + h) ^ byte</li>
+                                <li>احتفظ بعدد البتات المطلوب</li>
+                            </ul>
+                        </li>
+                        <li>حول النتيجة إلى سداسي عشري</li>
+                    </ol>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>التنفيذ الكامل:</h5>
+                            <pre><code>def simple_hash(message, bits=32):
+    if isinstance(message, str):
+        message = message.encode('utf-8')
+    
+    h = 0x5A3C  # قيمة أولية
+    
+    for byte in message:
+        h = ((h << 5) + h) ^ byte  # (h * 33) ^ byte
+        h &= ((1 << bits) - 1)    # الاحتفاظ بعدد البتات المطلوب
+    
+    hex_length = bits // 4
+    format_str = '%0' + str(hex_length) + 'x'
+    return format_str % h</code></pre>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>مثال:</h5>
+                            <pre>المدخل: "Hello"
+النتيجة (16 بت): 6c77
+النتيجة (32 بت): 4b9bb6c77</pre>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>للتعليم فقط:</strong> هذه الدالة بسيطة جداً وغير آمنة. لا تستخدمها في تطبيقات حقيقية تتطلب أماناً.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- خاتمة -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card crypto-card">
+                <div class="card-header bg-success text-white">
+                    <h3><i class="bi bi-check-circle-fill"></i> خلاصة</h3>
+                </div>
+                <div class="card-body">
+                    <h4>ما تعلمناه:</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>AES (التشفير المتماثل)</h5>
+                            <ul>
+                                <li>عمليات SubBytes, ShiftRows, MixColumns, AddRoundKey</li>
+                                <li>جدولة المفاتيح</li>
+                                <li>10 جولات للتشفير</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>RSA (التشفير غير المتماثل)</h5>
+                            <ul>
+                                <li>توليد الأعداد الأولية</li>
+                                <li>حساب المفاتيح العامة والخاصة</li>
+                                <li>التشفير بالأس السريع</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>دوال التجزئة</h5>
+                            <ul>
+                                <li>SHA-1: 160 بت، 80 جولة</li>
+                                <li>MD5: 128 بت، 64 جولة</li>
+                                <li>التجزئة البسيطة للتعليم</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <strong>نصيحة للدراسة:</strong> جرب تشغيل الخوارزميات خطوة بخطوة على ورقة لفهم كيفية عمل كل عملية. التطبيق العملي يساعد في فهم النظرية.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-header h2, .card-header h3 {
+        margin: 0;
+    }
+    
+    pre {
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+    
+    .alert {
+        border-radius: 8px;
+    }
+    
+    a[href^="#"] {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    
+    a[href^="#"]:hover {
+        text-decoration: underline;
+    }
+    
+    /* تحسين المظهر للشاشات الصغيرة */
+    @media (max-width: 768px) {
+        pre {
+            font-size: 0.8em;
+            overflow-x: auto;
+        }
+        
+        .crypto-card {
+            margin-bottom: 15px;
+        }
+    }
+</style>
+
+<script>
+    // تفعيل التمرير السلس
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // إضافة تأثيرات بصرية للكود
+    document.addEventListener('DOMContentLoaded', function() {
+        // تسليط الضوء على الكود عند النقر
+        const codeBlocks = document.querySelectorAll('pre code');
+        codeBlocks.forEach(block => {
+            block.addEventListener('click', function() {
+                this.style.backgroundColor = '#e3f2fd';
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 1000);
+            });
+        });
+    });
+</script>
+
+<script src="{{ url_for('static', filename='learn.js') }}"></script>
+</body>
+{% endblock %}

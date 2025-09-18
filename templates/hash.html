@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Hash - دوال التجزئة{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>دوال التجزئة (Hash)</h1>
+        <p class="lead">
+            دوال التجزئة تحول البيانات إلى قيمة ثابتة الطول.
+            لا يمكن استرجاع البيانات الأصلية من قيمة التجزئة.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card crypto-card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h3>حساب قيم التجزئة</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/hash">
+                    <div class="mb-3">
+                        <label for="text" class="form-label">النص:</label>
+                        <textarea class="form-control" id="text" name="text" rows="3" required></textarea>
+                        <small class="form-text text-muted">
+                            أدخل النص الذي تريد حساب قيمة التجزئة له.
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-warning">حساب قيم التجزئة</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card crypto-card">
+            <div class="card-header bg-info text-white">
+                <h3>كيف تعمل دوال التجزئة؟</h3>
+            </div>
+            <div class="card-body">
+                <p>
+                    دوال التجزئة هي خوارزميات تحول البيانات من أي حجم إلى قيمة ثابتة الطول.
+                    تتميز دوال التجزئة الجيدة بالخصائص التالية:
+                </p>
+                
+                <ul>
+                    <li><strong>الحتمية:</strong> نفس المدخلات تنتج دائماً نفس المخرجات.</li>
+                    <li><strong>السرعة:</strong> يمكن حساب قيمة التجزئة بسرعة.</li>
+                    <li><strong>مقاومة التصادم:</strong> من الصعب إيجاد مدخلين مختلفين ينتجان نفس قيمة التجزئة.</li>
+                    <li><strong>تأثير الانهيار:</strong> تغيير بسيط في المدخلات يؤدي إلى تغيير كبير في المخرجات.</li>
+                    <li><strong>عدم قابلية العكس:</strong> لا يمكن استرجاع البيانات الأصلية من قيمة التجزئة.</li>
+                </ul>
+                
+                <h5>استخدامات دوال التجزئة:</h5>
+                <ul>
+                    <li>تخزين كلمات المرور بشكل آمن</li>
+                    <li>التحقق من سلامة البيانات</li>
+                    <li>توقيع البيانات الرقمية</li>
+                    <li>تحديد هوية الملفات</li>
+                    <li>بناء هياكل البيانات مثل جداول التجزئة</li>
+                </ul>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>ملاحظة:</strong> في هذا التطبيق، نستخدم تنفيذات بسيطة لدوال التجزئة لأغراض تعليمية.
+                    للتطبيقات الحقيقية، يُفضل استخدام مكتبات مختبرة ومعتمدة.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if result %}
+<div class="row mt-4">
+    <div class="col">
+        <div class="card result-box">
+            <div class="card-header bg-warning text-dark">
+                <h3>نتائج التجزئة</h3>
+            </div>
+            <div class="card-body">
+                {% if result.error %}
+                <div class="alert alert-danger">
+                    {{ result.error }}
+                </div>
+                {% else %}
+                <h4>النص الأصلي:</h4>
+                <pre>{{ result.original }}</pre>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>SHA-1:</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ result.sha1 }}" readonly>
+                            <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.sha1 }}">
+                                <i class="bi bi-clipboard"></i> نسخ
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h4>MD5:</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ result.md5 }}" readonly>
+                            <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.md5 }}">
+                                <i class="bi bi-clipboard"></i> نسخ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>تجزئة بسيطة (16 بت):</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ result.simple_hash_16 }}" readonly>
+                            <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.simple_hash_16 }}">
+                                <i class="bi bi-clipboard"></i> نسخ
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h4>تجزئة بسيطة (32 بت):</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ result.simple_hash_32 }}" readonly>
+                            <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="{{ result.simple_hash_32 }}">
+                                <i class="bi bi-clipboard"></i> نسخ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>ملاحظة:</strong> لاحظ كيف تختلف قيم التجزئة في الطول والقيمة، لكنها جميعاً تمثل نفس النص الأصلي.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
